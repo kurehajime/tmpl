@@ -27,7 +27,7 @@ func Generate(templ string, csvStr string, nameCol int, ch chan Result) {
 	for row := 1; row < len(records); row++ {
 		str := templ
 		name := ""
-		for col := 0; col < len(head[0]); col++ {
+		for col := 0; col < len(head); col++ {
 			if col < len(head) && col < len(records[row]) {
 				str = strings.Replace(str, head[col], records[row][col], -1)
 			}

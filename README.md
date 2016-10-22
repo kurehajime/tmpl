@@ -1,6 +1,5 @@
 # tmpl
-tmpl : make files by template and csv
-
+tmpl makes files that replaced template text with csv by matched column name
 
 # install
 

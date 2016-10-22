@@ -7,13 +7,15 @@ tmpl makes files that replaced template text with csv by matched column name
 
 tmpl makes files that replaced template text with csv by matched column name
   -c string
-    	csv path
+    	[must]csv path
   -ce string
     	csv encoding (default "utf-8")
+  -n int
+    	Name column no (default -1)
   -o string
     	output path or file (default "./")
   -t string
-    	template path
+    	[must]template path
   -te string
     	template encoding (default "utf-8")
 ```

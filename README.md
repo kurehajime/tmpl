@@ -4,7 +4,7 @@ tmpl : make files by template and csv
 
 # install
 
-Download 
+[Download](https://github.com/kurehajime/tmpl/releases)
 
 or 
 

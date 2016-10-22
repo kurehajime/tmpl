@@ -1,0 +1,1 @@
+tmpl -c ./test.csv -t ./template.txt -o ./out.txt -n 3

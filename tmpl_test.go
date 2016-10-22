@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func GenerateTest(t *testing.T) {
+func TestGenerate(t *testing.T) {
 	temp := `　　　　　　　　　　　　　　　　　　　[報告書]
 日時：{いつ}
 場所：{どこ}
@@ -36,7 +36,7 @@ func GenerateTest(t *testing.T) {
 　　　おばあさんが桃をみつけた経緯には様々な要因が考えられる。
 　　　問題が表面化するに至ったのはむかしむかしだが、それ以前から問題は内在していたと
 　　　考えるのが自然であり、あるところでなくとも普遍的に起こり得る問題である。
-　　　おばあさん個人の問題として矮小化するのではなく、組織全体の問題として捉える必要がある。]`,
+　　　おばあさん個人の問題として矮小化するのではなく、組織全体の問題として捉える必要がある。`,
 		`　　　　　　　　　　　　　　　　　　　[報告書]
 日時：ある日
 場所：森の中
@@ -51,14 +51,15 @@ func GenerateTest(t *testing.T) {
 　　　問題が表面化するに至ったのはある日だが、それ以前から問題は内在していたと
 　　　考えるのが自然であり、森の中でなくとも普遍的に起こり得る問題である。
 　　　くまさん個人の問題として矮小化するのではなく、組織全体の問題として捉える必要がある。`}
-	result, err := Generate(temp, c)
-	if err != nil {
-		t.Errorf(err.Error())
-	}
-	for i := range asserts {
-		if result[i] != asserts[i] {
-			t.Errorf(result[i])
+	ch := make(chan Result)
+	go Generate(temp, c, -1, ch)
+	for res := range ch {
+		if res.Err != nil {
+			t.Errorf(res.Err.Error())
+			break
+		}
+		if res.Str != asserts[res.No-1] {
+			t.Errorf(asserts[res.No-1] + "\n" + res.Str)
 		}
 	}
-
 }

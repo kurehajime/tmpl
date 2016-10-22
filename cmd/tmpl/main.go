@@ -11,6 +11,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 
 	"github.com/kurehajime/tmpl"
@@ -26,6 +27,7 @@ func main() {
 	var encodeCsv string
 	var pathTemlate string
 	var pathCsv string
+	var nameCol int
 
 	var defaultEncoding string
 	var output string
@@ -35,13 +37,23 @@ func main() {
 	} else {
 		defaultEncoding = "utf-8"
 	}
+
+	flag.StringVar(&pathTemlate, "t", "", "[must]template path")
+	flag.StringVar(&pathCsv, "c", "", "[must]csv path")
 	flag.StringVar(&encodeTemplate, "te", defaultEncoding, "template encoding")
 	flag.StringVar(&encodeCsv, "ce", defaultEncoding, "csv encoding")
-	flag.StringVar(&pathTemlate, "t", "", "template encoding")
-	flag.StringVar(&pathCsv, "c", "", "csv encoding")
-	flag.StringVar(&output, "o", "./", "putput path or file")
+	flag.StringVar(&output, "o", "./", "output path or file")
+	flag.IntVar(&nameCol, "n", -1, "Name column no")
 
+	flag.Usage = func() {
+		fmt.Println("tmpl makes files that replaced template text with csv by matched column name")
+		flag.PrintDefaults()
+	}
 	flag.Parse()
+	if pathTemlate == "" || pathCsv == "" {
+		flag.Usage()
+		os.Exit(0)
+	}
 
 	csvStr, err = readFileByArg(pathCsv)
 	if err != nil {
@@ -64,17 +76,9 @@ func main() {
 		log.Fatal(err)
 		os.Exit(1)
 	}
-
-	result, err := tmpl.Generate(templateStr, csvStr)
-	if err != nil {
-		log.Fatal(err)
-		os.Exit(1)
-	}
-	err = writeFiles(output, result, pathTemlate)
-	if err != nil {
-		log.Fatal(err)
-		os.Exit(1)
-	}
+	ch := make(chan tmpl.Result)
+	go tmpl.Generate(templateStr, csvStr, nameCol, ch)
+	writeFile(output, pathTemlate, ch)
 }
 
 func readFileByArg(path string) (string, error) {
@@ -116,7 +120,7 @@ func transEnc(text string, encode string) (string, error) {
 	return string(f), nil
 }
 
-func writeFiles(pathOrFile string, strs []string, pathTemlate string) error {
+func writeFile(pathOrFile string, pathTemlate string, ch chan tmpl.Result) error {
 	var name string
 	var ext string
 	var dir string
@@ -132,10 +136,17 @@ func writeFiles(pathOrFile string, strs []string, pathTemlate string) error {
 		name = strings.Split(name, ".")[0]
 		ext = filepath.Ext(pathOrFile)
 	}
-	keta := math.Floor(math.Log10(float64(len(strs)))) + 1
-	for i := range strs {
-		idx := fmt.Sprintf("%0"+fmt.Sprint(keta)+"d", i+1)
-		ioutil.WriteFile(filepath.Join(dir, name+"_"+idx+ext), []byte(strs[i]), os.ModePerm)
+	for res := range ch {
+		if res.Err != nil {
+			return res.Err
+		}
+		idx := fmt.Sprintf("%0"+strconv.Itoa(int(math.Floor(math.Log10(float64(res.Total)))))+"d", res.No)
+		if res.Name != "" {
+			name = res.Name + ext
+		} else {
+			name = name + "_" + idx + ext
+		}
+		ioutil.WriteFile(filepath.Join(dir, name), []byte(res.Str), os.ModePerm)
 	}
 	return nil
 }

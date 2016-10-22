@@ -3,6 +3,8 @@ tmpl makes files that replaced template text with csv by matched column name
 
 ## Usage
 
+```
+
 tmpl makes files that replaced template text with csv by matched column name
   -c string
     	csv path
@@ -14,6 +16,7 @@ tmpl makes files that replaced template text with csv by matched column name
     	template path
   -te string
     	template encoding (default "utf-8")
+```
 
 ## install
 

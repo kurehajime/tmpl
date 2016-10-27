@@ -52,7 +52,7 @@ func TestGenerate(t *testing.T) {
 　　　考えるのが自然であり、森の中でなくとも普遍的に起こり得る問題である。
 　　　くまさん個人の問題として矮小化するのではなく、組織全体の問題として捉える必要がある。`}
 	ch := make(chan Result)
-	go Generate(temp, c, -1, ch)
+	go Generate(temp, c, -1, ch, false)
 	for res := range ch {
 		if res.Err != nil {
 			t.Errorf(res.Err.Error())
@@ -60,6 +60,23 @@ func TestGenerate(t *testing.T) {
 		}
 		if res.Str != asserts[res.No-1] {
 			t.Errorf(asserts[res.No-1] + "\n" + res.Str)
+		}
+	}
+}
+func TestGetRecords(t *testing.T) {
+	csv := `{いつ},{どこ},{だれ},{どうした}
+むかしむかし,あるところ,おばあさん,桃をみつけた
+ある日,森の中,くまさん,出会った`
+	tsv := `{いつ}	{どこ}	{だれ}	{どうした}
+むかしむかし	あるところ	おばあさん	桃をみつけた
+ある日	森の中	くまさん	出会った`
+	cs, _ := getRecords(csv, false)
+	ts, _ := getRecords(tsv, true)
+	for i := 0; i < len(cs); i++ {
+		for j := 0; j < len(cs[i]); j++ {
+			if cs[i][j] != ts[i][j] {
+				t.Errorf("%s != %s", cs[i][j], ts[i][j])
+			}
 		}
 	}
 }

@@ -15,9 +15,9 @@ type Result struct {
 }
 
 //Generate returns [](template x csv)
-func Generate(templ string, csvStr string, nameCol int, ch chan Result) {
+func Generate(templ string, csvStr string, nameCol int, ch chan Result, tsv bool) {
 	defer close(ch)
-	records, err := getRecords(csvStr)
+	records, err := getRecords(csvStr, tsv)
 	if err != nil {
 		ch <- Result{No: 0, Str: "", Name: "", Err: err, Total: 0}
 		return
@@ -38,8 +38,11 @@ func Generate(templ string, csvStr string, nameCol int, ch chan Result) {
 		ch <- Result{No: row, Str: str, Name: name, Err: nil, Total: total}
 	}
 }
-func getRecords(csvStr string) ([][]string, error) {
+func getRecords(csvStr string, tsv bool) ([][]string, error) {
 	r := csv.NewReader(strings.NewReader(csvStr))
+	if tsv {
+		r.Comma = []rune("\t")[0]
+	}
 	records, err := r.ReadAll()
 	if err != nil {
 		return nil, err

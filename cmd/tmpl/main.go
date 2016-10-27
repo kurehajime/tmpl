@@ -28,6 +28,7 @@ func main() {
 	var pathTemlate string
 	var pathCsv string
 	var nameCol int
+	var tsv bool
 
 	var defaultEncoding string
 	var output string
@@ -44,6 +45,7 @@ func main() {
 	flag.StringVar(&encodeCsv, "ce", defaultEncoding, "csv encoding")
 	flag.StringVar(&output, "o", "./", "output path or file")
 	flag.IntVar(&nameCol, "n", -1, "Name column no")
+	flag.BoolVar(&tsv, "tsv", false, "TSV:Tab-Separated Values")
 
 	flag.Usage = func() {
 		fmt.Println("tmpl makes files that replaced template text with csv by matched column name")
@@ -77,7 +79,7 @@ func main() {
 		os.Exit(1)
 	}
 	ch := make(chan tmpl.Result)
-	go tmpl.Generate(templateStr, csvStr, nameCol, ch)
+	go tmpl.Generate(templateStr, csvStr, nameCol, ch, tsv)
 	writeFile(output, pathTemlate, ch)
 }
 

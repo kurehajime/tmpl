@@ -52,7 +52,7 @@ func TestGenerate(t *testing.T) {
 　　　考えるのが自然であり、森の中でなくとも普遍的に起こり得る問題である。
 　　　くまさん個人の問題として矮小化するのではなく、組織全体の問題として捉える必要がある。`}
 	ch := make(chan Result)
-	go Generate(temp, c, -1, ch, false)
+	go Generate(temp, c, -1, ch, false, false)
 	for res := range ch {
 		if res.Err != nil {
 			t.Errorf(res.Err.Error())
@@ -63,6 +63,26 @@ func TestGenerate(t *testing.T) {
 		}
 	}
 }
+
+func TestGenerateR(t *testing.T) {
+	temp := "1200円になります"
+	c := `\d+
+500
+10`
+	asserts := []string{"500円になります", "10円になります"}
+	ch := make(chan Result)
+	go Generate(temp, c, -1, ch, false, true)
+	for res := range ch {
+		if res.Err != nil {
+			t.Errorf(res.Err.Error())
+			break
+		}
+		if res.Str != asserts[res.No-1] {
+			t.Errorf(asserts[res.No-1] + "\n" + res.Str)
+		}
+	}
+}
+
 func TestGetRecords(t *testing.T) {
 	csv := `{いつ},{どこ},{だれ},{どうした}
 むかしむかし,あるところ,おばあさん,桃をみつけた

@@ -3,6 +3,7 @@ package tmpl
 
 import (
 	"encoding/csv"
+	"regexp"
 	"strings"
 )
 
@@ -15,7 +16,7 @@ type Result struct {
 }
 
 //Generate returns [](template x csv)
-func Generate(templ string, csvStr string, nameCol int, ch chan Result, tsv bool) {
+func Generate(templ string, csvStr string, nameCol int, ch chan Result, tsv bool, regex bool) {
 	defer close(ch)
 	records, err := getRecords(csvStr, tsv)
 	if err != nil {
@@ -29,7 +30,12 @@ func Generate(templ string, csvStr string, nameCol int, ch chan Result, tsv bool
 		name := ""
 		for col := 0; col < len(head); col++ {
 			if col < len(head) && col < len(records[row]) {
-				str = strings.Replace(str, head[col], records[row][col], -1)
+				if regex {
+					re := regexp.MustCompile(head[col])
+					str = re.ReplaceAllString(str, records[row][col])
+				} else {
+					str = strings.Replace(str, head[col], records[row][col], -1)
+				}
 			}
 		}
 		if nameCol >= 0 && nameCol < len(records[row]) {

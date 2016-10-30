@@ -14,10 +14,14 @@ tmpl makes files that replaced template text with csv by matched column name
     	Name column no (default -1)
   -o string
     	output path or file (default "./")
+  -regex
+    	regex
   -t string
     	[must]template path
   -te string
     	template encoding (default "utf-8")
+  -tsv
+    	TSV:Tab-Separated Values
 ```
 
 ## install

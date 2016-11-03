@@ -44,7 +44,7 @@ func main() {
 	flag.StringVar(&pathCsv, "c", "", "[must]csv path")
 	flag.StringVar(&encodeTemplate, "te", defaultEncoding, "template encoding")
 	flag.StringVar(&encodeCsv, "ce", defaultEncoding, "csv encoding")
-	flag.StringVar(&output, "o", "./", "output path or file")
+	flag.StringVar(&output, "o", "./", "output path or file ( - as standard IO)")
 	flag.IntVar(&nameCol, "n", -1, "Name column no")
 	flag.BoolVar(&tsv, "tsv", false, "TSV:Tab-Separated Values")
 	flag.BoolVar(&regex, "regex", false, "regex")
@@ -128,6 +128,7 @@ func writeFile(pathOrFile string, pathTemlate string, ch chan tmpl.Result) error
 	var name string
 	var ext string
 	var dir string
+	var filename string
 	stat, err := os.Stat(pathOrFile)
 
 	if err == nil && stat.IsDir() == true {
@@ -135,22 +136,29 @@ func writeFile(pathOrFile string, pathTemlate string, ch chan tmpl.Result) error
 		_, name = filepath.Split(pathTemlate)
 		name = strings.Split(name, ".")[0]
 		ext = filepath.Ext(pathTemlate)
+	} else if pathOrFile == "-" {
+
 	} else {
 		dir, name = filepath.Split(pathOrFile)
 		name = strings.Split(name, ".")[0]
 		ext = filepath.Ext(pathOrFile)
 	}
 	for res := range ch {
+		filename = ""
 		if res.Err != nil {
 			return res.Err
 		}
 		idx := fmt.Sprintf("%0"+strconv.Itoa(int(math.Floor(math.Log10(float64(res.Total)))))+"d", res.No)
 		if res.Name != "" {
-			name = res.Name + ext
+			filename = res.Name + ext
 		} else {
-			name = name + "_" + idx + ext
+			filename = name + "_" + idx + ext
 		}
-		ioutil.WriteFile(filepath.Join(dir, name), []byte(res.Str), os.ModePerm)
+		if pathOrFile != "-" {
+			ioutil.WriteFile(filepath.Join(dir, filename), []byte(res.Str), os.ModePerm)
+		} else {
+			fmt.Println(res.Str)
+		}
 	}
 	return nil
 }

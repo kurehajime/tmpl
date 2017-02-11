@@ -4,6 +4,18 @@
     "version": "0.1.0",
     "command": "go",
     "isShellCommand": true,
-    "args": ["build"],
-    "showOutput": "always"
+    "args": [],
+    "showOutput": "always",
+    "tasks":
+  [ { "taskName": "test"
+    ,"isTestCommand": true
+    , "suppressTaskName": true
+    , "args": ["test"]
+    }
+  , { "taskName": "build"
+    ,"isBuildCommand": true
+    , "suppressTaskName": true
+    , "args": ["build"]
+    }
+  ]
 }

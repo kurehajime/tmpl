@@ -25,14 +25,19 @@ func Generate(templ string, csvStr string, nameCol int, ch chan Result, tsv bool
 	}
 	head := records[0]
 	total := len(records)
+
+	reArray := make([]*regexp.Regexp, len(head))
+	for col := 0; col < len(head); col++ {
+		reArray[col] = regexp.MustCompile(head[col])
+	}
+
 	for row := 1; row < len(records); row++ {
 		str := templ
 		name := ""
 		for col := 0; col < len(head); col++ {
 			if col < len(head) && col < len(records[row]) {
 				if regex {
-					re := regexp.MustCompile(head[col])
-					str = re.ReplaceAllString(str, records[row][col])
+					str = reArray[col].ReplaceAllString(str, records[row][col])
 				} else {
 					str = strings.Replace(str, head[col], records[row][col], -1)
 				}

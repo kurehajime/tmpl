@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+//Result :Generate text
 type Result struct {
 	No    int
 	Str   string
@@ -49,6 +50,7 @@ func Generate(templ string, csvStr string, nameCol int, ch chan Result, tsv bool
 		ch <- Result{No: row, Str: str, Name: name, Err: nil, Total: total}
 	}
 }
+
 func getRecords(csvStr string, tsv bool) ([][]string, error) {
 	r := csv.NewReader(strings.NewReader(csvStr))
 	if tsv {

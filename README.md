@@ -31,5 +31,5 @@ tmpl makes files that replaced template text with csv by matched column name
 or 
 
 ```
-$ go get -u github.com/kurehajime/tmpl/...
+$ go install github.com/kurehajime/tmpl/tree/master/cmd/tmpl@latest
 ```
